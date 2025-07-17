@@ -24,29 +24,30 @@ def generate_emotion_data(n=10000, seed=42):
     noise = np.random.normal(0, 1, (n, 3))
 
     happy_score = (
-        sleep_hours * 0.6 +
-        (10 - work_stress) * 0.5 +
-        social_mins * 0.03 +
-        nutrition_score * 0.6 -
-        alcohol * 0.3 +
-        noise[:, 0]
+          0.4 * sleep_hours
+        + 0.5 * (10 - work_stress)
+        + 0.03 * social_mins
+        + 0.4 * nutrition_score
+        - 0.2 * alcohol
+        + noise[:, 0]
     )
 
     energetic_score = (
-        steps * 0.001 +
-        sleep_hours * 0.5 -
-        alcohol * 0.4 +
-        nutrition_score * 0.4 -
-        work_stress * 0.3 +
-        noise[:, 1]
+          0.001 * steps
+        + 0.5 * sleep_hours
+        - 0.4 * alcohol
+        + 0.4 * nutrition_score
+        - 0.3 * work_stress
+        + noise[:, 1]
     )
 
     engaged_score = (
-        work_stress * -0.2 +
-        social_mins * 0.05 +
-        nutrition_score * 0.3 +
-        sleep_hours * 0.4 +
-        noise[:, 2]
+        -0.3 * work_stress
+        + 0.05 * social_mins
+        + 0.3 * nutrition_score
+        + 0.3 * sleep_hours
+        + 0.0005 * steps
+        + noise[:, 2]
     )
 
     logits = np.stack([happy_score, energetic_score, engaged_score], axis=1)
@@ -60,6 +61,9 @@ def generate_emotion_data(n=10000, seed=42):
         'social_mins': social_mins,
         'work_stress': work_stress,
         'nutrition_score': nutrition_score,
+        'happy_score': happy_score,
+        'energetic_score': energetic_score,
+        'engaged_score': engaged_score,
         'happy_prob': prob[:, 0],
         'energetic_prob': prob[:, 1],
         'engaged_prob': prob[:, 2],

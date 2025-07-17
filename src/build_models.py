@@ -4,6 +4,7 @@ import os
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
 from xgboost import XGBClassifier
 
@@ -14,8 +15,11 @@ def train_and_save_models(df, folder='output'):
     X = df[['sleep_hours', 'steps', 'alcohol', 'social_mins', 'work_stress', 'nutrition_score']]
     y = df['predicted_emotion']
 
+    label_encoder = LabelEncoder()
+    y_encoded = label_encoder.fit_transform(y)
+
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, stratify=y, test_size=0.2, random_state=42
+        X, y_encoded, stratify=y_encoded, test_size=0.2, random_state=42
     )
 
     param_grid = {
@@ -32,7 +36,7 @@ def train_and_save_models(df, folder='output'):
 
         if use_scaler:
             steps.append(('scaler', StandardScaler()))
-        steps.append(('xgb', XGBClassifier(use_label_encoder=False, eval_metric='mlogloss', random_state=42)))
+        steps.append(('xgb', XGBClassifier(eval_metric='mlogloss', random_state=42)))
 
         pipe = Pipeline(steps)
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
